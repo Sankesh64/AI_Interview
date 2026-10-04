@@ -24,29 +24,29 @@ The project consists of a decoupled frontend and backend:
 
 ```mermaid
 graph TD
-    Client[Frontend: React + Vite] -->|HTTPS Requests| API_Gateway[Backend: FastAPI]
+        Client["Frontend: React + Vite"] -->|HTTPS Requests| API_Gateway["Backend: FastAPI"]
     
     subgraph Frontend Architecture
-        Client -->|Auth State| Login[Google Login Button]
-        Client -->|Protected| Dashboard[Practice Dashboard]
-        Client -->|Interactive| Chat[Interview Chat Interface]
+        Client -->|Auth State| Login["Google Login Button"]
+        Client -->|Protected| Dashboard["Practice Dashboard"]
+        Client -->|Interactive| Chat["Interview Chat Interface"]
     end
     
-    API_Gateway -->|OAuth 2.0| GoogleAuth[Google Auth Server]
-    API_Gateway -->|Session Cookie| SessionMiddleware[Starlette Session Middleware]
+    API_Gateway -->|OAuth 2.0| GoogleAuth["Google Auth Server"]
+    API_Gateway -->|Session Cookie| SessionMiddleware["Starlette Session Middleware"]
     
     subgraph Backend Architecture
-        API_Gateway --> AuthRouter["/auth"]
-        API_Gateway --> ChatRouter["/api/chat"]
-        API_Gateway --> InterviewRouter["/api/interview"]
+        API_Gateway --> AuthRouter["/auth Endpoint"]
+        API_Gateway --> ChatRouter["/api/chat Endpoint"]
+        API_Gateway --> InterviewRouter["/api/interview Endpoint"]
         
         AuthRouter -->|Handles| GoogleAuth
         ChatRouter -->|Protected by| SessionMiddleware
         InterviewRouter -->|Protected by| SessionMiddleware
         
-        ChatRouter --> QwenService[Qwen AI Service]
+        ChatRouter --> QwenService["Qwen AI Service"]
         InterviewRouter --> QwenService
-        InterviewRouter --> OCRService[PyTesseract OCR]
+        InterviewRouter --> OCRService["PyTesseract OCR"]
     end
 ```
 
