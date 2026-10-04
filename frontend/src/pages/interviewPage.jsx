@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useParams, useLocation } from "react-router-dom";
 import StartInterview from "../components/StartInterview";
 import Interview from "../components/Interview";
 import Report from "../components/Report";
@@ -6,8 +7,14 @@ import Header from "../components/Header";
 import Footer from "../components/Footer";
 
 const InterviewPage = () => {
-  const [stage, setStage] = useState("start");
-  const [sessionId, setSessionId] = useState(null);
+  const { sessionIdParam } = useParams();
+  const location = useLocation();
+  const [stage, setStage] = useState(() => {
+    if (location.pathname.startsWith("/report/")) return "report";
+    if (location.pathname.startsWith("/interview/") && sessionIdParam) return "interview";
+    return "start";
+  });
+  const [sessionId, setSessionId] = useState(sessionIdParam || null);
 
   const handleSessionCreated = (id) => {
     setSessionId(id);

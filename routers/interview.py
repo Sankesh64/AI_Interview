@@ -101,7 +101,12 @@ async def report(session_id: str):
     if not session:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Interview Session Not Found")
     
+    import json
+    if session.feedback:
+        return { "result": json.loads(session.feedback) }
+    
     resp = await generate_report(session.answers)
+    session.feedback = json.dumps(resp)
 
     return { "result":  resp }
 

@@ -13,6 +13,8 @@ function App() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/dashboard" element={<DashboardPage />} />
         <Route path="/interview" element={<InterviewPage />} />
+        <Route path="/interview/:sessionIdParam" element={<InterviewPage />} />
+        <Route path="/report/:sessionIdParam" element={<InterviewPage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
