@@ -1,12 +1,19 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import GoogleLoginButton from "../components/GoogleLoginButton";
+import { getCurrentUser } from "../services/auth";
 
 const LoginPage = () => {
   const navigate = useNavigate();
   const [mode, setMode] = useState("login");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+
+  useEffect(() => {
+    getCurrentUser().then((user) => {
+      if (user) navigate("/dashboard");
+    });
+  }, [navigate]);
 
   const handleSubmit = (e) => {
     e.preventDefault();

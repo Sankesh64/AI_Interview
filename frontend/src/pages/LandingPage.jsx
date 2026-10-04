@@ -1,10 +1,17 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
+import { getCurrentUser } from "../services/auth";
 
 const LandingPage = () => {
   const navigate = useNavigate();
+
+  useEffect(() => {
+    getCurrentUser().then((user) => {
+      if (user) navigate("/dashboard");
+    });
+  }, [navigate]);
 
   const features = [
     {

@@ -72,17 +72,19 @@ const Header = () => {
           <span>interviewly</span>
         </Link>
 
-        <nav style={{ display: "flex", alignItems: "center", gap: 40 }}>
-          <Link to="/#how" style={{ fontSize: 14, color: "#475569", fontWeight: 500, textDecoration: "none" }}>
-            How it works
-          </Link>
-          <Link to="/#practice" style={{ fontSize: 14, color: "#475569", fontWeight: 500, textDecoration: "none" }}>
-            Practice
-          </Link>
-          <Link to="/#resources" style={{ fontSize: 14, color: "#475569", fontWeight: 500, textDecoration: "none" }}>
-            Resources
-          </Link>
-        </nav>
+        {!user && !loading && (
+          <nav style={{ display: "flex", alignItems: "center", gap: 40 }}>
+            <Link to="/#how" style={{ fontSize: 14, color: "#475569", fontWeight: 500, textDecoration: "none" }}>
+              How it works
+            </Link>
+            <Link to="/#practice" style={{ fontSize: 14, color: "#475569", fontWeight: 500, textDecoration: "none" }}>
+              Practice
+            </Link>
+            <Link to="/#resources" style={{ fontSize: 14, color: "#475569", fontWeight: 500, textDecoration: "none" }}>
+              Resources
+            </Link>
+          </nav>
+        )}
 
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
           {loading ? (
