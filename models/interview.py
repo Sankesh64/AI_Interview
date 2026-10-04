@@ -15,6 +15,8 @@ class Answer(BaseModel):
 
 class Interview(BaseModel):
     session_id: str
+    user_id: Optional[str] = None
+    job_title: str = "General Role"
     candidate_name: str
     questions: list[str] = []
     interviewer_name: str

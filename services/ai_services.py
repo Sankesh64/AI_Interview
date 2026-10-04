@@ -80,44 +80,76 @@ async def generate_report(answers: list) -> dict:
     total = len(answers) if answers else 1
     answered_ratio = len(answered) / total
 
-    base_score = 70
-    score = int(min(100, base_score + answered_ratio * 25))
+    # Prepare Q/A for prompt
+    qa_list = []
+    for i, a in enumerate(answers):
+        status = "SKIPPED" if a.skip else "ANSWERED"
+        qa_list.append(f"Q{i+1}: {a.question}\nA{i+1} ({status}): {a.answer if a.answer else '(No answer provided)'}")
+    
+    qa_text = "\n\n".join(qa_list)
 
-    strengths = [
-        "Completed the full interview session end-to-end",
-        "Provided structured responses to most questions",
-        "Showed commitment and engaged with the practice session",
-    ]
+    prompt = f"""
+You are an expert AI Interview Evaluator. I will provide you with a candidate's interview transcript.
+Your job is to analyze their performance, provide a fair score out of 100, identify strengths, and point out areas for improvement.
 
-    if answered_ratio > 0.7:
-        strengths.append("Answered most questions without skipping")
+INTERVIEW TRANSCRIPT:
+{qa_text}
 
-    improvements = [
-        "Use the STAR method (Situation, Task, Action, Result) consistently for behavioral answers",
-        "Include specific metrics and quantified results where possible",
-        "Avoid skipping questions — even short answers are better than none",
-    ]
+STATISTICS:
+Total Questions: {total}
+Answered: {len(answered)}
+Skipped: {len(skipped)}
 
-    if skipped:
-        improvements.append(f"You skipped {len(skipped)} question(s). Consider answering all questions next time.")
+Please output ONLY a JSON object with the following format:
+{{
+  "overall_score": 85,
+  "strengths": [
+    "Strength 1...",
+    "Strength 2..."
+  ],
+  "improvements": [
+    "Improvement 1...",
+    "Improvement 2..."
+  ],
+  "per_question_feedback": [
+    {{
+      "question": "Q1 text...",
+      "score": 90,
+      "feedback": "Feedback for Q1..."
+    }}
+  ]
+}}
+Note: The overall_score must heavily penalize skipped questions (e.g. if all questions are skipped, the score should be around 0 to 20 max). Give a score out of 100 for each individual question in per_question_feedback (skipped questions should get 0-20).
+"""
+
+    try:
+        response_str = ask_qwen(prompt, system_prompt="You are a strict and fair AI evaluator. Output ONLY valid raw JSON. Do not wrap output in markdown codeblocks.")
+        clean_json = response_str.strip()
+        if clean_json.startswith("```"):
+            clean_json = clean_json.split("```")[1]
+            if clean_json.startswith("json"):
+                clean_json = clean_json[4:]
+        clean_json = clean_json.strip()
+
+        data = json.loads(clean_json)
+        if isinstance(data, dict) and "overall_score" in data:
+            return data
+    except Exception as e:
+        logger.error(f"Failed to generate report via AI, using structured fallback: {e}", exc_info=True)
+
+    # Fallback logic if AI fails
+    base_score = 40
+    score = int(min(100, base_score + answered_ratio * 40)) if answered_ratio > 0 else 0
+
+    strengths = ["Completed the interview session"] if answered_ratio > 0 else ["Logged into the platform"]
+    improvements = ["Try to answer more questions"] if skipped else ["Provide more detailed answers"]
 
     per_question_feedback = []
-    for idx, a in enumerate(answers):
+    for a in answers:
         if a.skip:
-            feedback = "This question was skipped. Try answering it next time for complete feedback."
-            q_score = max(40, score - 25)
-        elif a.answer and len(a.answer) > 120:
-            feedback = "Solid response with good detail. Consider adding more specific metrics if possible."
-            q_score = min(100, score + 5)
+            per_question_feedback.append({"question": a.question, "score": 0, "feedback": "Skipped."})
         else:
-            feedback = "Short answer. Aim for 2-3 sentences with more context and examples."
-            q_score = max(55, score - 10)
-
-        per_question_feedback.append({
-            "question": a.question,
-            "score": q_score,
-            "feedback": feedback,
-        })
+            per_question_feedback.append({"question": a.question, "score": 80, "feedback": "Good attempt."})
 
     return {
         "overall_score": score,

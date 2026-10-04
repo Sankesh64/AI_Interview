@@ -1,135 +1,39 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-
-const DashboardHeader = () => {
-  const navigate = useNavigate();
-
-  return (
-    <header
-      style={{
-        background: "#f8fafc",
-        borderBottom: "1px solid #e2e8f0",
-      }}
-    >
-      <div
-        className="container"
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          height: 64,
-        }}
-      >
-        <div style={{ display: "flex", alignItems: "center", gap: 40 }}>
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 8,
-              fontWeight: 700,
-              fontSize: 18,
-            }}
-          >
-            <div
-              style={{
-                width: 32,
-                height: 32,
-                borderRadius: 8,
-                background: "linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                color: "white",
-              }}
-            >
-              ✨
-            </div>
-            <span>interviewly</span>
-          </div>
-
-          <nav style={{ display: "flex", gap: 32 }}>
-            <a href="#" style={{ fontSize: 14, color: "#475569", fontWeight: 500 }}>
-              How it works
-            </a>
-            <a
-              href="#"
-              style={{
-                fontSize: 14,
-                color: "#4f46e5",
-                fontWeight: 600,
-                borderBottom: "2px solid #4f46e5",
-                paddingBottom: 20,
-              }}
-            >
-              Practice
-            </a>
-            <a href="#" style={{ fontSize: 14, color: "#475569", fontWeight: 500 }}>
-              Resources
-            </a>
-          </nav>
-        </div>
-
-        <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
-          <button className="btn btn-ghost" style={{ fontWeight: 600, color: "#475569" }}>
-            Upgrade
-          </button>
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 8,
-              fontSize: 14,
-              fontWeight: 600,
-              color: "#334155",
-            }}
-          >
-            JD
-            <span>▾</span>
-          </div>
-        </div>
-      </div>
-    </header>
-  );
-};
+import Header from "../components/Header";
+import { getHistory } from "../services/interview";
+import { getCurrentUser } from "../services/auth";
 
 const DashboardPage = () => {
   const navigate = useNavigate();
+  const [history, setHistory] = useState([]);
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    getCurrentUser().then(setUser).catch(console.error);
+    getHistory().then(data => {
+      if (data && data.history) setHistory(data.history);
+    }).catch(console.error);
+  }, []);
 
   const stats = [
     {
       label: "Interviews completed",
-      value: "12",
-      change: "+3 this month",
+      value: history.filter(h => h.status === "completed").length.toString(),
+      change: "-",
       positive: true,
     },
     {
       label: "Average score",
-      value: "78%",
-      change: "+8% vs last month",
+      value: "-",
+      change: "-",
       positive: true,
     },
     {
       label: "Practice streak",
-      value: "6 days",
-      change: "🔥",
+      value: "-",
+      change: "-",
       positive: true,
-    },
-  ];
-
-  const practices = [
-    {
-      role: "Senior Product Manager",
-      type: "Behavioral interview",
-      lastPracticed: "Yesterday",
-      status: "Resume",
-      primary: true,
-    },
-    {
-      role: "Frontend Engineer",
-      type: "Technical screen",
-      lastPracticed: "4 days ago",
-      status: "Practice",
-      primary: false,
     },
   ];
 
@@ -140,22 +44,19 @@ const DashboardPage = () => {
   ];
 
   return (
-    <div className="page" style={{ background: "#f8fafc" }}>
-      <DashboardHeader />
+    <div className="page" style={{ background: "#f8fafc", minHeight: "100vh", display: "flex", flexDirection: "column" }}>
+      <Header />
 
-      <main className="container" style={{ flex: 1, padding: "32px 24px", maxWidth: 1200 }}>
+      <main className="container" style={{ flex: 1, padding: "32px 24px", maxWidth: 1200, margin: "0 auto", width: "100%" }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: 28 }}>
           <div>
             <h1 style={{ fontSize: 28, fontWeight: 700, marginBottom: 4 }}>
-              Good morning, Jordan
+              Good morning{user ? `, ${user.name || user.email.split('@')[0]}` : ''}
             </h1>
             <p style={{ color: "#64748b", fontSize: 14 }}>
               Ready to turn your next interview into an offer?
             </p>
           </div>
-          <button className="btn btn-outline" style={{ borderRadius: 8 }}>
-            View progress
-          </button>
         </div>
 
         <div
@@ -181,8 +82,7 @@ const DashboardPage = () => {
               Choose a role and get personalized questions, follow-up prompts, and feedback.
             </p>
             <button
-              className="btn btn-white"
-              style={{ borderRadius: 8, padding: "10px 20px" }}
+              style={{ borderRadius: 8, padding: "10px 20px", color: "#4f46e5", background: "white", fontWeight: "bold", border: "none", cursor: "pointer" }}
               onClick={() => navigate("/interview")}
             >
               Start interview
@@ -214,7 +114,7 @@ const DashboardPage = () => {
 
         <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 20, marginBottom: 24 }}>
           {stats.map((s, i) => (
-            <div key={i} className="card" style={{ padding: 24 }}>
+            <div key={i} className="card" style={{ padding: 24, background: "white", borderRadius: 12, border: "1px solid #e2e8f0" }}>
               <p style={{ fontSize: 13, color: "#64748b", marginBottom: 8 }}>{s.label}</p>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end" }}>
                 <p style={{ fontSize: 32, fontWeight: 700, letterSpacing: "-0.02em" }}>
@@ -235,40 +135,65 @@ const DashboardPage = () => {
         </div>
 
         <div style={{ display: "grid", gridTemplateColumns: "1.6fr 1fr", gap: 20 }}>
-          <div className="card" style={{ padding: 24 }}>
+          <div className="card" style={{ padding: 24, background: "white", borderRadius: 12, border: "1px solid #e2e8f0" }}>
             <h3 style={{ fontSize: 16, fontWeight: 700, marginBottom: 20 }}>
-              Continue practicing
+              Interview History
             </h3>
             <div style={{ display: "flex", flexDirection: "column" }}>
-              {practices.map((p, i) => (
-                <div
-                  key={i}
-                  style={{
-                    padding: "16px 0",
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    borderBottom: i < practices.length - 1 ? "1px solid #e2e8f0" : "none",
-                  }}
-                >
-                  <div>
-                    <p style={{ fontWeight: 600, fontSize: 14, marginBottom: 4 }}>{p.role}</p>
-                    <p style={{ fontSize: 13, color: "#64748b", marginBottom: 4 }}>{p.type}</p>
-                    <p style={{ fontSize: 12, color: "#94a3b8" }}>Last practiced {p.lastPracticed}</p>
-                  </div>
+              {history.length === 0 ? (
+                <div style={{ padding: "32px 0", textAlign: "center", color: "#64748b" }}>
+                  <p>No interviews yet.</p>
                   <button
-                    className={`btn ${p.primary ? "btn-primary" : "btn-outline"}`}
-                    style={{ borderRadius: 8 }}
+                    className="btn btn-outline"
+                    style={{ marginTop: 12, borderRadius: 8, padding: "8px 16px", cursor: "pointer", border: "1px solid #e2e8f0", background: "white", fontWeight: 600, color: "#0f172a" }}
                     onClick={() => navigate("/interview")}
                   >
-                    {p.status}
+                    Start your first interview
                   </button>
                 </div>
-              ))}
+              ) : (
+                history.map((h, i) => (
+                  <div
+                    key={i}
+                    style={{
+                      padding: "16px 0",
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                      borderBottom: i < history.length - 1 ? "1px solid #e2e8f0" : "none",
+                    }}
+                  >
+                    <div>
+                      <p style={{ fontWeight: 600, fontSize: 14, marginBottom: 4 }}>{h.job_title}</p>
+                      <p style={{ fontSize: 13, color: "#64748b", marginBottom: 4 }}>
+                        {new Date(h.scheduled_time).toLocaleDateString()}
+                      </p>
+                      <p style={{ fontSize: 12, color: h.status === "completed" ? "#059669" : "#f59e0b" }}>
+                        {h.status.charAt(0).toUpperCase() + h.status.slice(1)}
+                      </p>
+                    </div>
+                    {h.status === "completed" ? (
+                      <button
+                        style={{ borderRadius: 8, fontSize: 13, padding: "6px 12px", border: "1px solid #e2e8f0", background: "white", cursor: "pointer" }}
+                        onClick={() => navigate(`/report/${h.session_id}`)}
+                      >
+                        View Report
+                      </button>
+                    ) : (
+                      <button
+                        style={{ borderRadius: 8, fontSize: 13, padding: "6px 12px", border: "none", background: "#4f46e5", color: "white", cursor: "pointer" }}
+                        onClick={() => navigate(`/interview/${h.session_id}`)}
+                      >
+                        Resume
+                      </button>
+                    )}
+                  </div>
+                ))
+              )}
             </div>
           </div>
 
-          <div className="card" style={{ padding: 24 }}>
+          <div className="card" style={{ padding: 24, background: "white", borderRadius: 12, border: "1px solid #e2e8f0" }}>
             <h3 style={{ fontSize: 16, fontWeight: 700, marginBottom: 20 }}>
               Resources for you
             </h3>
@@ -278,7 +203,7 @@ const DashboardPage = () => {
                   <div>
                     <p style={{ fontSize: 13, fontWeight: 500, marginBottom: 6 }}>{r.title}</p>
                     <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-                      <span className="badge" style={{ padding: "2px 8px", fontSize: 11 }}>
+                      <span className="badge" style={{ padding: "2px 8px", fontSize: 11, background: "#f1f5f9", borderRadius: 12, color: "#475569" }}>
                         {r.type}
                       </span>
                       <span style={{ fontSize: 11, color: "#94a3b8" }}>{r.time}</span>
@@ -288,12 +213,13 @@ const DashboardPage = () => {
                 </div>
               ))}
               <a
-                href="#"
+                href="/#resources"
                 style={{
                   fontSize: 13,
                   color: "#4f46e5",
                   fontWeight: 500,
                   marginTop: 8,
+                  textDecoration: "none"
                 }}
               >
                 Browse all resources →
@@ -309,6 +235,7 @@ const DashboardPage = () => {
             borderTop: "1px solid #e2e8f0",
             fontSize: 13,
             color: "#64748b",
+            textAlign: "center"
           }}
         >
           interviewly · Practice smarter, interview stronger.

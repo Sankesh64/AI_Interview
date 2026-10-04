@@ -6,6 +6,7 @@ export const INTERVIEW_ENDPOINTS = {
   SUBMIT: "/interview/submit",
   END: "/interview/end",
   REPORT: "/interview/report",
+  HISTORY: "/interview/history",
 };
 
 export const ROLES = [

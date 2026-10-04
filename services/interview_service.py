@@ -3,11 +3,13 @@ from models.interview import Answer, Interview, InterviewStatus
 from store.session_store import SESSION_STORE
 
 
-def create_session() -> Interview:
+def create_session(user_id: str = None, job_title: str = "General Role") -> Interview:
     session_id = str(uuid.uuid4())
 
     interview_session = Interview(
         session_id=session_id,
+        user_id=user_id,
+        job_title=job_title,
         candidate_name="Candidate",
         interviewer_name="AI Interviewer",
         scheduled_time="2024-01-01T00:00:00Z"
@@ -39,3 +41,9 @@ def save_answer(answer: str | None, skip: bool, session: Interview):
 
     if session.current_index == len(session.questions):
         session.status = InterviewStatus.COMPLETED
+
+def get_history(user_id: str) -> list[Interview]:
+    if not user_id:
+        return []
+    history = [session for session in SESSION_STORE.values() if session.user_id == user_id]
+    return sorted(history, key=lambda x: x.scheduled_time, reverse=True)

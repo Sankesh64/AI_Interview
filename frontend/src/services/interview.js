@@ -3,6 +3,7 @@ import { API_BASE_URL, INTERVIEW_ENDPOINTS } from "../util/constant";
 
 const api = axios.create({
   baseURL: API_BASE_URL,
+  withCredentials: true,
   headers: {
     "Content-Type": "application/json",
   },
@@ -44,5 +45,10 @@ export const endInterview = async (sessionId) => {
 
 export const getReport = async (sessionId) => {
   const response = await api.get(`${INTERVIEW_ENDPOINTS.REPORT}/${sessionId}`);
+  return response.data;
+};
+
+export const getHistory = async () => {
+  const response = await api.get(INTERVIEW_ENDPOINTS.HISTORY);
   return response.data;
 };

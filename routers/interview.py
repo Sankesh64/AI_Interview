@@ -1,10 +1,10 @@
-from fastapi import APIRouter, File, Form, HTTPException, UploadFile, status
+from fastapi import APIRouter, File, Form, HTTPException, UploadFile, status, Request
 
 from models.interview import Interview, Answer, InterviewStatus
 from request_model.AnswerResquest import AnswerRequest
 from response_model.AnswerResponse import AnswerResponse
 from services.ai_services import generate_questions_intro, generate_report
-from services.interview_service import create_session, get_session, save_answer
+from services.interview_service import create_session, get_session, save_answer, get_history
 from util.file_util import extract_text, validate_file
 
 
@@ -15,6 +15,7 @@ router = APIRouter(
 
 @router.post("/generate-question")
 async def generate_questions(
+    request: Request,
     job_title: str = Form(...),
     job_description: str = Form(...),
     mode: str = Form("demo"),
@@ -34,7 +35,10 @@ async def generate_questions(
         mode=mode
     )
 
-    session = create_session()
+    user = request.session.get("user")
+    user_id = user.get("id") if user else None
+
+    session = create_session(user_id=user_id, job_title=job_title)
     session.questions = resp.get("questions")
     session.introText = resp.get("introText")
 
@@ -100,3 +104,23 @@ async def report(session_id: str):
     resp = await generate_report(session.answers)
 
     return { "result":  resp }
+
+@router.get("/history")
+async def history(request: Request):
+    user = request.session.get("user")
+    if not user:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Not authenticated")
+    
+    sessions = get_history(user.get("id"))
+    
+    return {
+        "history": [
+            {
+                "session_id": s.session_id,
+                "job_title": s.job_title,
+                "status": s.status,
+                "scheduled_time": s.scheduled_time
+            }
+            for s in sessions
+        ]
+    }
