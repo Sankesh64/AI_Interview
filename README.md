@@ -36,9 +36,9 @@ graph TD
     API_Gateway -->|Session Cookie| SessionMiddleware[Starlette Session Middleware]
     
     subgraph Backend Architecture
-        API_Gateway --> AuthRouter[/auth]
-        API_Gateway --> ChatRouter[/api/chat]
-        API_Gateway --> InterviewRouter[/api/interview]
+        API_Gateway --> AuthRouter["/auth"]
+        API_Gateway --> ChatRouter["/api/chat"]
+        API_Gateway --> InterviewRouter["/api/interview"]
         
         AuthRouter -->|Handles| GoogleAuth
         ChatRouter -->|Protected by| SessionMiddleware
