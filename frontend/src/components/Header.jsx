@@ -73,15 +73,15 @@ const Header = () => {
         </Link>
 
         <nav style={{ display: "flex", alignItems: "center", gap: 40 }}>
-          <a href="/#how" style={{ fontSize: 14, color: "#475569", fontWeight: 500 }}>
+          <Link to="/#how" style={{ fontSize: 14, color: "#475569", fontWeight: 500, textDecoration: "none" }}>
             How it works
-          </a>
-          <a href="/#practice" style={{ fontSize: 14, color: "#475569", fontWeight: 500 }}>
+          </Link>
+          <Link to="/#practice" style={{ fontSize: 14, color: "#475569", fontWeight: 500, textDecoration: "none" }}>
             Practice
-          </a>
-          <a href="/#resources" style={{ fontSize: 14, color: "#475569", fontWeight: 500 }}>
+          </Link>
+          <Link to="/#resources" style={{ fontSize: 14, color: "#475569", fontWeight: 500, textDecoration: "none" }}>
             Resources
-          </a>
+          </Link>
         </nav>
 
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>

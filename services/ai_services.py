@@ -6,7 +6,7 @@ logger = logging.getLogger(__name__)
 
 async def generate_questions_intro(job_title: str, job_description: str, resume_text: str, mode: str = "demo") -> dict:
     is_demo = str(mode).lower() == "demo"
-    num_questions = 3 if is_demo else 12
+    num_questions = 3 if is_demo else 6
 
     prompt = f"""
 You are an expert AI Interviewer designing a structured interview for a candidate applying for the role of '{job_title}'.
@@ -17,7 +17,7 @@ JOB DESCRIPTION:
 CANDIDATE RESUME / EXPERIENCE:
 {resume_text or "General software candidate background with past technical internships and project experience."}
 
-INTERVIEW MODE: {"DEMO (3 short introductory/familiarization questions)" if is_demo else "FULL INTERVIEW (10 to 12 medium-to-hard level questions deeply testing past internships, technical projects, architecture, and problem solving skills)"}
+INTERVIEW MODE: {"DEMO (3 short introductory/familiarization questions)" if is_demo else "FULL INTERVIEW (6 medium-to-hard level questions deeply testing past internships, technical projects, architecture, and problem solving skills)"}
 
 Please output ONLY a JSON object with the following format:
 {{
@@ -57,17 +57,11 @@ Ensure the 'questions' array has exactly {num_questions} questions.
             f"Welcome! Let's dive right into your experience. Based on your resume, could you walk me through your key technical contributions at your recent internship or project?",
             f"In your past projects listed on your resume, how did you decide on the technical stack and architecture for the {job_title} domain?",
             f"Describe a complex technical challenge or bug you encountered during your past work. How did you diagnose and solve it under pressure?",
-            f"Looking at the job description for {job_title}, how do your hands-on skills with your core technologies align with our requirements?",
-            f"Can you explain a trade-off you had to make between code performance, maintainability, and delivery speed in a real-world project?",
             f"Walk me through how you handle code reviews, testing, and continuous integration in your engineering workflow.",
             f"Tell me about a time when a project requirement changed unexpectedly midway through development. How did you adapt your implementation?",
-            f"How do you approach optimizing database queries or API endpoints when experiencing high latency?",
-            f"Describe a scenario where you had to collaborate closely with cross-functional team members (designers, PMs, or backend engineers) to resolve a deadlock.",
-            f"What security practices and data validation steps do you strictly enforce when developing production applications?",
-            f"How do you stay up to date with modern tools, frameworks, and best practices in the {job_title} landscape?",
             f"Where do you see your technical specialization evolving over the next 3 to 5 years, and how does this role fit into your career vision?"
         ]
-        introText = f"Welcome to your Full Interview for the {job_title} position. This comprehensive session consists of 12 medium-to-hard questions designed to deeply evaluate your past experience, technical problem solving, and project achievements. Speak clearly and elaborate fully on your answers!"
+        introText = f"Welcome to your Full Interview for the {job_title} position. This comprehensive session consists of 6 medium-to-hard questions designed to deeply evaluate your past experience, technical problem solving, and project achievements. Speak clearly and elaborate fully on your answers!"
 
     return {
         "questions": questions,
