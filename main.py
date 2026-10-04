@@ -23,8 +23,8 @@ FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:5173")
 app.add_middleware(
     SessionMiddleware,
     secret_key=SESSION_SECRET,
-    same_site="lax",
-    https_only=False,  # Set to True in production with HTTPS
+    same_site="none",
+    https_only=True,
 )
 
 # CORS middleware configured for credentialed requests (session cookies)
