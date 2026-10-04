@@ -1,0 +1,11 @@
+fastapi
+uvicorn
+python-dotenv
+python-multipart
+httpx
+requests
+PyPDF2
+pillow
+pytesseract
+authlib
+itsdangerous
